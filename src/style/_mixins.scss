@@ -20,3 +20,9 @@
   -ms-flex: $value;
   flex: $value;
 }
+@mixin flex-direction($vlaue) {
+  -webkit-flex-direction: $value;
+  -moz-flex-direction: $value;
+  -ms-flex-direction: $value;
+  flex-direction: $vlaue;
+}
