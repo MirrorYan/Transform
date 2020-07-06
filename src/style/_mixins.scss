@@ -1,0 +1,22 @@
+/*
+ * @file
+ * Mixins
+ */
+
+// About flex layout.
+@mixin flex {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -moz-box;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+@mixin flex-grow($value) {
+  -webkit-box-flex: $value;
+  -webkit-flex: $value;
+  -moz-box-flex: $value;
+  -moz-flex: $value;
+  -ms-flex: $value;
+  flex: $value;
+}
