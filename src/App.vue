@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import Header from './components/Header';
+import Header from './components/parts/Header';
 
 export default {
   name: 'App',
@@ -16,11 +16,7 @@ export default {
 };
 </script>
 
-<style>
-* {
-  margin: 0;
-  box-sizing: border-box;
-}
+<style lang="scss">
 #app {
   width: 100%;
   height: 100vh;
