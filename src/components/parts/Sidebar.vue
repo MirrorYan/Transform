@@ -1,47 +1,36 @@
 <template>
   <el-menu
     default-active="2"
-    class="el-menu-vertical-demo">
-    <el-submenu index="1">
-      <template slot="title">
-        <i class="el-icon-location"></i>
-        <span>导航一</span>
-      </template>
-      <el-menu-item-group>
-        <template slot="title">分组一</template>
-        <el-menu-item index="1-1">选项1</el-menu-item>
-        <el-menu-item index="1-2">选项2</el-menu-item>
-      </el-menu-item-group>
-      <el-menu-item-group title="分组2">
-        <el-menu-item index="1-3">选项3</el-menu-item>
-      </el-menu-item-group>
-      <el-submenu index="1-4">
-        <template slot="title">选项4</template>
-        <el-menu-item index="1-4-1">选项1</el-menu-item>
-      </el-submenu>
-    </el-submenu>
-    <el-menu-item index="2">
-      <i class="el-icon-menu"></i>
-      <span slot="title">导航二</span>
-    </el-menu-item>
-    <el-menu-item index="3" disabled>
-      <i class="el-icon-document"></i>
-      <span slot="title">导航三</span>
-    </el-menu-item>
-    <el-menu-item index="4">
-      <i class="el-icon-setting"></i>
-      <span slot="title">导航四</span>
+    class="left-aside-menu">
+    <el-menu-item
+      v-for="(item, index) in ymlList"
+      :index="'a-'+index"
+      :key="index">
+      <em class="el-icon-document"></em>
+      <span slot="title" :data-url="item.url">{{item.name}}</span>
     </el-menu-item>
   </el-menu>
 </template>
 
 <script>
+import axios from 'axios';
+import { URL } from '../../utils/request';
 export default {
   name: 'Sidebar',
   components: {
   },
+  created () {
+    let that = this;
+    axios({
+      method: 'get',
+      url: URL.getList
+    }).then((res) => {
+      that.ymlList = res.data.detail;
+    });
+  },
   data () {
     return {
+      ymlList: []
     }
   }
 }

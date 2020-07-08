@@ -1,20 +1,25 @@
 <template>
   <div class="container">
     <Sidebar />
-    <codemirror
-      ref="mycode"
-      :options="jsonOpt"
-    />
-    <codemirror
-      ref="mycode"
-      :options="yamlOpt"
-    />
+    <div class="code-container json-code">
+      <div class="title">JSON</div>
+      <codemirror
+        ref="jsonEditor"
+        :options="jsonOpt"
+      />
+    </div>
+    <div class="code-container yml-code">
+      <div class="title">YAML</div>
+      <codemirror
+        ref="ymlEditor"
+        :options="yamlOpt"
+      />
+    </div>
   </div>
 </template>
 
 <script>
 import Sidebar from './parts/Sidebar';
-
 import 'codemirror/addon/lint/lint.css';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/addon/lint/lint';
@@ -45,18 +50,15 @@ export default {
 
 <style lang="scss" scoped>
 .container {
-  @include flex;
+  display: flex;
 }
 .el-menu {
-  @include flex-grow(1);
+  flex: 1;
+}
+.code-container {
+  flex: 3;
 }
 .vue-codemirror {
-  @include flex-grow(3);
-}
-.CodeMirror {
   height: 100%;
-}
-.CodeMirror-scroll {
-  width: 100%;
 }
 </style>
