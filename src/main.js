@@ -16,10 +16,12 @@ Vue.use(VueCodemirror, {
     theme: 'duotone-light',
     scrollbarStyle: 'simple',
     tabSize: 2,
+    lint: true,
     lineWrapping: false, // 滚动以显示长行
     lineNumbers: true,   // 在左侧显示行号
     matchBrakets: true, // 括号匹配
     cursorScrollMargin: 5,
+    gutters: ['CodeMirror-lint-markers'],
   }
 });
 

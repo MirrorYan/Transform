@@ -5,9 +5,11 @@
     <el-menu-item
       v-for="(item, index) in ymlList"
       :index="'a-'+index"
-      :key="index">
+      :key="index"
+      :data-url="item.url"
+      @click="onMenuClk">
       <em class="el-icon-document"></em>
-      <span slot="title" :data-url="item.url">{{item.name}}</span>
+      <span slot="title">{{item.name}}</span>
     </el-menu-item>
   </el-menu>
 </template>
@@ -19,7 +21,7 @@ export default {
   name: 'Sidebar',
   components: {
   },
-  created () {
+  beforeCreate () {
     let that = this;
     axios({
       method: 'get',
@@ -31,6 +33,18 @@ export default {
   data () {
     return {
       ymlList: []
+    }
+  },
+  methods: {
+    onMenuClk (e) {
+      const url = e.$attrs['data-url'];
+      const that = this;
+      axios({
+        method: 'get',
+        url: URL.getDetail + '?yaml_path=' + url
+      }).then((res) => {
+        that.$emit('detail', res.data.detail)
+      });
     }
   }
 }
