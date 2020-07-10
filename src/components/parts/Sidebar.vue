@@ -36,6 +36,7 @@ export default {
     }
   },
   methods: {
+    // Click(Left aside Menu) => Load json
     onMenuClk (e) {
       const url = e.$attrs['data-url'];
       const that = this;
@@ -43,7 +44,7 @@ export default {
         method: 'get',
         url: URL.getDetail + '?yaml_path=' + url
       }).then((res) => {
-        that.$emit('detail', res.data.detail)
+        that.$emit('detail', res.data)
       });
     }
   }

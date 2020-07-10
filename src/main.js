@@ -16,12 +16,14 @@ Vue.use(VueCodemirror, {
     theme: 'duotone-light',
     scrollbarStyle: 'simple',
     tabSize: 2,
-    lint: true,
+    lint: true, // 开启语法检查
     lineWrapping: false, // 滚动以显示长行
     lineNumbers: true,   // 在左侧显示行号
     matchBrakets: true, // 括号匹配
     cursorScrollMargin: 5,
+    // foldGutter: true, // 支持代码折叠
     gutters: ['CodeMirror-lint-markers'],
+    // gutters: ['CodeMirror-foldgutter', 'CodeMirror-foldgutter', 'CodeMirror-lint-markers'],
   }
 });
 

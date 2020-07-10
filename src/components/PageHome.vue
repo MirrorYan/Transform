@@ -7,20 +7,26 @@
         ref="jsonEditor"
         :options="jsonOpt"
         :value="jsonValue"
+        @changes="onJsonChg"
       />
     </div>
     <div class="button-group">
       <el-button type="primary">Save</el-button>
-      <el-button type="success">Run</el-button>
+      <el-button
+        type="success"
+        @click="onRunClk"
+      >Run</el-button>
       <el-button type="info" plain>har2yaml</el-button>
       <el-button
         type="warning"
         plain
-        @click="onJSONtoYML(1, json)">
+        @click="onTransClk(1, jsonValue)">
         <em class="el-icon-right"></em>json2yaml
       </el-button>
       <el-button
-        type="danger" plain>
+        type="danger"
+        plain
+        @click="onTransClk(2, yamlValue)">
         <em class="el-icon-back"></em>yaml2json
       </el-button>
     </div>
@@ -29,25 +35,42 @@
       <codemirror
         ref="ymlEditor"
         :options="yamlOpt"
+        :value="yamlValue"
+        @changes="onYamlChg"
       />
     </div>
+    <SideDrawer
+      :drawer="drawer"
+      @close="DrawerClose"
+    />
   </div>
 </template>
 
 <script>
 import Sidebar from './parts/Sidebar';
+import SideDrawer from './parts/SideDrawer';
 import axios from 'axios';
 import { URL } from '../utils/request';
 import 'codemirror/addon/lint/lint.css';
 require('script-loader!jsonlint');
-import 'codemirror/mode/javascript/javascript';
 import 'codemirror/addon/lint/lint';
+import 'codemirror/mode/javascript/javascript';
 import 'codemirror/addon/lint/json-lint';
+import 'codemirror/mode/yaml/yaml';
+import 'codemirror/addon/lint/yaml-lint';
+// import 'codemirror/addon/fold/foldgutter.css'
+// import 'codemirror/addon/fold/foldcode';
+// import 'codemirror/addon/fold/foldgutter';
+// import 'codemirror/addon/fold/brace-fold';
+// import 'codemirror/addon/fold/comment-fold';
+
+window.jsyaml = require('js-yaml');
 
 export default {
   name: 'PageHome',
   components: {
-    Sidebar
+    Sidebar,
+    SideDrawer
   },
   data () {
     return {
@@ -55,19 +78,37 @@ export default {
         mode: "application/json"
       },
       yamlOpt: {
-        mode: "application/yaml"
+        mode: "text/x-yaml"
       },
-      json: {},
-      jsonValue: ""
+      jsonValue: '',
+      yamlValue: '',
+      drawer: false
     }
   },
   methods: {
+    // Custom => Get file content from Sidebar component.
     onGetDetail (detail) {
-      this.json = detail;
-      this.jsonValue = JSON.stringify(detail, null, 2);
+      detail.yamlDetail
+        ? (this.yamlValue = detail.yamlDetail)
+        : (this.yamlValue = '');
+      if (detail.jsonDetail) {
+        this.jsonValue = JSON.stringify(detail.jsonDetail, null, 2);
+      } else {
+        this.jsonValue = '';
+      }
     },
-    onJSONtoYML (type, text) {
-      console.log(URL.convert)
+    // Change => Synchronize data to jsonValue.
+    onJsonChg (el) {
+      this.jsonValue = el.getValue();
+    },
+    // Change => Synchronize data to yamlValue.
+    onYamlChg (el) {
+      this.yamlValue = el.getValue();
+    },
+    // Click(YAML <=> JSON) => Transform the code type.
+    onTransClk (type, text) {
+      const that = this;
+      type === 1 && (text = JSON.parse(text));
       axios({
         method: 'post',
         url: URL.convert,
@@ -79,10 +120,20 @@ export default {
           data: text
         }
       }).then((res) => {
-         console.log(res.data.detail);
-      }).then((res) => {
-        console.log(res);
-      })
+        const { detail } = res.data;
+        if (type === 1) {
+          that.yamlValue = detail;
+        } else if (type === 2) {
+          that.jsonValue = detail;
+        }
+      });
+    },
+    // Click(Run btn) => 
+    onRunClk () {
+      this.drawer = true;
+    },
+    DrawerClose () {
+      this.drawer = false;
     }
   }
 }

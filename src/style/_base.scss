@@ -9,6 +9,7 @@
 }
 body {
   font-size: 16px;
+  font-family: "Hiragino Sans GB", Arial, sans-serif;
 }
 h2 {
   font-weight: 500;
@@ -24,11 +25,22 @@ h2 {
 
 .left-aside-menu {
   overflow: auto;
-} 
+}
 
+// CodeMirror
 .CodeMirror {
   height: 100%;
   &.cm-s-duotone-light {
     background-color: #fff;
   }
+}
+
+// Drawer
+.el-drawer__header {
+  [role=heading] {
+    outline: 0;
+  }
+}
+.el-drawer__body {
+  padding: 0 25px;
 }
