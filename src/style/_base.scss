@@ -27,6 +27,15 @@ h2 {
   overflow: auto;
 }
 
+
+.table-container {
+  max-width: 100%;
+  overflow: auto;
+  table {
+    width: 100%;
+  }
+}
+
 // CodeMirror
 .CodeMirror {
   height: 100%;
@@ -36,6 +45,9 @@ h2 {
 }
 
 // Drawer
+.el-drawer.rtl {
+  overflow: auto;
+}
 .el-drawer__header {
   [role=heading] {
     outline: 0;
@@ -43,4 +55,9 @@ h2 {
 }
 .el-drawer__body {
   padding: 0 25px;
+}
+
+// Dialog
+.el-dialog__body {
+  font-size: 16px;
 }

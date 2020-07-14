@@ -1,6 +1,5 @@
-import Vue from 'vue'
-import Router from 'vue-router'
-import PageHome from '@/components/PageHome'
+import Vue from 'vue';
+import Router from 'vue-router';
 
 Vue.use(Router)
 
@@ -8,8 +7,12 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'HomePage',
-      component: PageHome
+      name: 'Home',
+      component: () => import ('@/components/PageHome')
+    }, {
+      path: '/report',
+      name: 'Report',
+      component: () => import ('@/components/PageReport')
     }
   ]
 })

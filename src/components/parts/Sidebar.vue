@@ -44,7 +44,7 @@ export default {
         method: 'get',
         url: URL.getDetail + '?yaml_path=' + url
       }).then((res) => {
-        that.$emit('detail', res.data)
+        that.$emit('detail', res.data);
       });
     }
   }

@@ -16,7 +16,13 @@
         type="success"
         @click="onRunClk"
       >Run</el-button>
-      <el-button type="info" plain>har2yaml</el-button>
+      <el-upload
+        :action="uploadHar"
+        :on-success="handleSuccess"
+        accept=".har"
+      >
+        <el-button type="info" plain>har2yaml</el-button>
+      </el-upload>
       <el-button
         type="warning"
         plain
@@ -40,9 +46,75 @@
       />
     </div>
     <SideDrawer
+      v-if="runData"
       :drawer="drawer"
+      :datas="runData"
+      @request="onRequstDtl"
       @close="DrawerClose"
     />
+    <el-dialog
+      v-if="requestDtl"
+      title="Request and Response data"
+      center="true"
+      destroy-on-close="true"
+      :visible.sync="dialogTableVisible">
+      <div class="dialog-block">
+        <p class="title">Request</p>
+        <div class="table-container">
+          <table class="table">
+            <tr v-for="(value, key) in requestDtl.request" :key="key">
+              <th>{{key}}</th>
+              <td v-if="typeof value == 'object'">
+                <p v-for="(innerValue, innerKey) in value" :key="innerKey">
+                  <strong>{{innerKey}} : </strong>{{innerValue}}
+                </p>
+              </td>
+              <td v-else>{{value}}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <div class="dialog-block">
+        <p class="title">Response</p>
+        <div class="table-container">
+          <table class="table">
+            <tr v-for="(value, key) in requestDtl.response" :key="key">
+              <th>{{key}}</th>
+              <td v-if="typeof value == 'object'">
+                <p v-for="(innerValue, innerKey) in value" :key="innerKey">
+                  <strong>{{innerKey}} : </strong>{{innerValue}}
+                </p>
+              </td>
+              <td v-else>{{value}}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <div class="dialog-block">
+        <p class="title">Validators</p>
+        <el-table :data="runData.validators" fit>
+          <el-table-column type="check" label="check" />
+          <el-table-column type="check_value" label="check value" />
+          <el-table-column type="check_result" label="check result" />
+          <el-table-column type="expect" label="expect value" />
+          <el-table-column type="comparator" label="comparator" />
+          <el-table-column type="method" label="method" />
+        </el-table>
+      </div>
+      <div class="dialog-block">
+        <p class="title">Step Extractor</p>
+        <div class="table-container">
+          <table class="table">
+            <template v-for="item in requestDtl.step_extractor">
+              <tr v-for="(value, key) in item" :key="key">
+                <th>{{key}}</th>
+                <td>{{value}}</td>
+              </tr>
+            </template>
+          </table>
+        </div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -58,11 +130,6 @@ import 'codemirror/mode/javascript/javascript';
 import 'codemirror/addon/lint/json-lint';
 import 'codemirror/mode/yaml/yaml';
 import 'codemirror/addon/lint/yaml-lint';
-// import 'codemirror/addon/fold/foldgutter.css'
-// import 'codemirror/addon/fold/foldcode';
-// import 'codemirror/addon/fold/foldgutter';
-// import 'codemirror/addon/fold/brace-fold';
-// import 'codemirror/addon/fold/comment-fold';
 
 window.jsyaml = require('js-yaml');
 
@@ -82,7 +149,12 @@ export default {
       },
       jsonValue: '',
       yamlValue: '',
-      drawer: false
+      url: '',
+      runData: null,
+      requestDtl: null,
+      drawer: false,
+      dialogTableVisible: false,
+      uploadHar: URL.uploadHar
     }
   },
   methods: {
@@ -128,12 +200,43 @@ export default {
         }
       });
     },
-    // Click(Run btn) => 
+    // Click(Run btn) => Run the code & Open SideDrawer.
     onRunClk () {
-      this.drawer = true;
+      let json;
+      try {
+        json = JSON.parse(this.jsonValue);
+      } catch (err) {
+        this.$message({
+          type: "warning",
+          message: 'JSON内容不符合规则，不能执行哦',
+          duration: 2000
+        });
+        return;
+      }
+      axios({
+        url: URL.runYaml,
+        method: 'post',
+        data: {
+          json_data: json
+        }
+      }).then((res) => {
+        if (res.data.code != 10000) return;
+        this.runData = res.data;
+        this.drawer = true;
+      });
+    },
+    onRequstDtl (requestDtl) {
+      console.log(1);
+      this.requestDtl = requestDtl;
+      this.dialogTableVisible = true;
     },
     DrawerClose () {
       this.drawer = false;
+    },
+    // For .har file upload success.
+    handleSuccess (res, file, fileList) {
+      this.jsonValue = JSON.stringify(res, null, 2);
+      this.yamlValue = '';
     }
   }
 }
@@ -152,12 +255,9 @@ export default {
 .el-button {
   display: block;
   width: 100%;
-  margin: auto;
+  margin: 20px auto 0;
   padding: 10px 15px;
   font-size: 16px;
-  & + .el-button {
-    margin-top: 20px;
-  }
   em {
     font-size: 20px;
     font-weight: bold;
@@ -180,5 +280,33 @@ export default {
 .vue-codemirror {
   flex: 1;
   height: 0;
+}
+
+.dialog-block {
+  & + .dialog-block {
+    margin-top: 40px;
+  }
+  .title {
+    display: inline-block;
+    padding: 8px 10px;
+    margin-bottom: 10px;
+    font-size: 18px;
+    font-weight: 700;
+    border-radius: 3px;
+    background-color: $light-blue;
+  }
+  table {
+    text-align: left;
+    line-height: 1.4;
+    border-top: 1px solid #EBEEF5;
+  }
+  th, td {
+    padding: 10px;
+    border-bottom: 1px solid #EBEEF5;
+  }
+  th {
+    padding-left: 0;
+    white-space: nowrap;
+  }
 }
 </style>

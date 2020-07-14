@@ -4,4 +4,7 @@ export const URL = {
   getList: domain + 'getYamlList', // 获取文件目录列表
   getDetail: domain + 'getYamlDetail', // 获取文件详情
   convert: domain + 'convert', // JSON & YAML 转换
+  runYaml: domain + 'Api/runYaml', // 执行
+  uploadHar: domain + 'uploadHarFile', // 上传Har文件
+
 };

@@ -19,11 +19,14 @@
 <script>
 export default {
   name: 'Header',
-  components: {
-  },
   data () {
     return {
       activeIndex: '1'
+    }
+  },
+  computed: {
+    isActive () {
+      
     }
   }
 }
