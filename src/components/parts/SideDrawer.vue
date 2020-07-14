@@ -39,10 +39,17 @@
         <div slot="header">测试步骤</div>
         <el-table
           :data="datas.details[0].records"
+          max-height="500"
           fit
           stripe>
           <el-table-column type="index" label="序号" width="50" align="center" />
           <el-table-column prop="name" label="用例名称" />
+          <el-table-column
+            prop="meta_data.response.response_time_ms"
+            width="110"
+            label="执行时间(ms)"
+            align="center"
+          />
           <el-table-column label="执行状态">
             <el-tag
               slot-scope="scope"

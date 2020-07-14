@@ -2,33 +2,22 @@
   <header>
     <h2>JSON和YML在线转换</h2>
     <el-menu
-      :default-active="activeIndex"
+      :default-active="$route.path"
       mode="horizontal"
+      router
     >
-      <el-menu-item index="1">Home</el-menu-item>
-      <el-menu-item index="2">mock</el-menu-item>
-      <el-menu-item index="3">config</el-menu-item>
-      <el-menu-item index="4">report</el-menu-item>
-      <el-menu-item index="5">log</el-menu-item>
-      <el-menu-item index="6">cron</el-menu-item>
-      <el-menu-item index="7">py</el-menu-item>
+      <el-menu-item
+        v-for="(item, index) in $router.options.routes"
+        :index="item.path"
+        :key="index"
+      >{{item.name}}</el-menu-item>
     </el-menu>
   </header>
 </template>
 
 <script>
 export default {
-  name: 'Header',
-  data () {
-    return {
-      activeIndex: '1'
-    }
-  },
-  computed: {
-    isActive () {
-      
-    }
-  }
+  name: 'Header'
 }
 </script>
 
