@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container" v-loading="loading">
     <Sidebar @detail="onGetDetail" />
     <div class="code-container json-code">
       <div class="title">JSON</div>
@@ -17,6 +17,7 @@
         @click="onRunClk"
       >Run</el-button>
       <el-upload
+        class="upload-har"
         :action="uploadHar"
         :on-success="handleSuccess"
         accept=".har"
@@ -141,6 +142,7 @@ export default {
   },
   data () {
     return {
+      loading: false,
       jsonOpt: {
         mode: "application/json"
       },
@@ -202,6 +204,7 @@ export default {
     },
     // Click(Run btn) => Run the code & Open SideDrawer.
     onRunClk () {
+      if (this.loading) return;
       let json;
       try {
         json = JSON.parse(this.jsonValue);
@@ -213,6 +216,7 @@ export default {
         });
         return;
       }
+      this.loading = true;
       axios({
         url: URL.runYaml,
         method: 'post',
@@ -223,6 +227,7 @@ export default {
         if (res.data.code != 10000) return;
         this.runData = res.data;
         this.drawer = true;
+        this.loading = false;
       });
     },
     onRequstDtl (requestDtl) {
