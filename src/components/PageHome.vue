@@ -1,6 +1,6 @@
 <template>
   <div class="container" v-loading="loading">
-    <Sidebar @detail="onGetDetail" />
+    <Sidebar @detail="handleGetDetail" />
     <div class="code-container json-code">
       <div class="title">JSON</div>
       <codemirror
@@ -12,24 +12,19 @@
     </div>
     <div class="button-group">
       <el-button type="primary">Save</el-button>
-      <el-button
-        type="success"
+      <el-button type="success"
         @click="onRunClk"
       >Run</el-button>
-      <el-upload
-        class="upload-har"
+      <el-upload class="upload-har"
         :action="uploadHar"
-        :on-success="handleSuccess"
-        accept=".har"
-      >
+        :on-success="handleHarSucc"
+        accept=".har">
         <el-button type="info" plain>har2yaml</el-button>
       </el-upload>
-      <el-button
-        type="warning"
+      <el-button type="warning"
         plain
-        @click="onTransClk(1, jsonValue)">
-        <em class="el-icon-right"></em>json2yaml
-      </el-button>
+        @click="onTransClk(1, jsonValue)"
+      ><em class="el-icon-right"></em>json2yaml</el-button>
       <el-button
         type="danger"
         plain
@@ -122,8 +117,7 @@
 <script>
 import Sidebar from './parts/Sidebar';
 import SideDrawer from './parts/SideDrawer';
-import axios from 'axios';
-import { URL } from '../utils/request';
+import { uploadHar, JsYmConvert } from '../utils/api';
 import 'codemirror/addon/lint/lint.css';
 require('script-loader!jsonlint');
 import 'codemirror/addon/lint/lint';
@@ -156,20 +150,18 @@ export default {
       requestDtl: null,
       drawer: false,
       dialogTableVisible: false,
-      uploadHar: URL.uploadHar
+      uploadHar
     }
   },
   methods: {
     // Custom => Get file content from Sidebar component.
-    onGetDetail (detail) {
-      detail.yamlDetail
-        ? (this.yamlValue = detail.yamlDetail)
+    handleGetDetail (detail) {
+      detail.yamldata
+        ? (this.yamlValue = detail.yamldata)
         : (this.yamlValue = '');
-      if (detail.jsonDetail) {
-        this.jsonValue = JSON.stringify(detail.jsonDetail, null, 2);
-      } else {
-        this.jsonValue = '';
-      }
+      detail.jsondata
+        ? (this.jsonValue = JSON.stringify(detail.jsondata, null, 2))
+        : (this.jsonValue = '');
     },
     // Change => Synchronize data to jsonValue.
     onJsonChg (el) {
@@ -178,29 +170,6 @@ export default {
     // Change => Synchronize data to yamlValue.
     onYamlChg (el) {
       this.yamlValue = el.getValue();
-    },
-    // Click(YAML <=> JSON) => Transform the code type.
-    onTransClk (type, text) {
-      const that = this;
-      type === 1 && (text = JSON.parse(text));
-      axios({
-        method: 'post',
-        url: URL.convert,
-        header: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        data: {
-          type,
-          data: text
-        }
-      }).then((res) => {
-        const { detail } = res.data;
-        if (type === 1) {
-          that.yamlValue = detail;
-        } else if (type === 2) {
-          that.jsonValue = detail;
-        }
-      });
     },
     // Click(Run btn) => Run the code & Open SideDrawer.
     onRunClk () {
@@ -239,9 +208,24 @@ export default {
       this.drawer = false;
     },
     // For .har file upload success.
-    handleSuccess (res, file, fileList) {
+    handleHarSucc (res, file, fileList) {
       this.jsonValue = JSON.stringify(res, null, 2);
       this.yamlValue = '';
+    },
+    // Click(YAML <=> JSON) => Transform the code type.
+    onTransClk (type, text) {
+      const that = this;
+      let valueName = 'jsonValue';
+      if (type === 1) {
+        text = JSON.parse(text);
+        valueName = 'yamlValue';
+      }
+      JsYmConvert({
+        type,
+        data: text
+      }).then(res => {
+        that[valueName] = res.detail;
+      });
     }
   }
 }

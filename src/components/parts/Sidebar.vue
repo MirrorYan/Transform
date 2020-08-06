@@ -1,56 +1,62 @@
 <template>
-  <el-menu
-    default-active="2"
-    class="left-aside-menu">
-    <el-menu-item
-      v-for="(item, index) in ymlList"
-      :index="'a-'+index"
-      :key="index"
-      :data-url="item.url"
-      @click="onMenuClk">
-      <em class="el-icon-document"></em>
-      <span slot="title">{{item.name}}</span>
-    </el-menu-item>
-  </el-menu>
+  <el-tabs class="sidebar" v-model="activeTab">
+    <el-tab-pane label="History" name="history">      
+    </el-tab-pane>
+    <el-tab-pane label="Collections" name="collection">
+      <el-menu class="left-aside-menu" default-active="test-0">
+        <el-menu-item
+          v-for="(item, index) in testcaseLst"
+          :index="'test-'+index"
+          :key="index"
+          @click="onTestcaseClk(item.id)">
+          <em class="el-icon-document"></em>
+          <span slot="title">{{item.name}}</span>
+        </el-menu-item>
+      </el-menu>
+    </el-tab-pane>
+    <el-tab-pane label="APIs" name="api"></el-tab-pane>
+  </el-tabs>
 </template>
 
 <script>
-import axios from 'axios';
-import { URL } from '../../utils/request';
+import { getTstcsLst, getTstcsDtl } from '../../utils/api';
 export default {
   name: 'Sidebar',
   components: {
   },
   beforeCreate () {
     let that = this;
-    axios({
-      method: 'get',
-      url: URL.getList
-    }).then((res) => {
-      that.ymlList = res.data.detail;
-    });
+    // Load testcase list.
+    getTstcsLst().then(res => { that.testcaseLst = res.data });
   },
   data () {
     return {
-      ymlList: []
+      activeTab: 'history',
+      testcaseLst: []
     }
   },
   methods: {
-    // Click(Left aside Menu) => Load json
-    onMenuClk (e) {
-      const url = e.$attrs['data-url'];
+    // Click(testcase) => Load json
+    onTestcaseClk (id) {
       const that = this;
-      axios({
-        method: 'get',
-        url: URL.getDetail + '?yaml_path=' + url
-      }).then((res) => {
-        that.$emit('detail', res.data);
-      });
+      getTstcsDtl(id).then(res => { that.$parent.handleGetDetail(res.data) });
     }
   }
 }
 </script>
 
 <style lang="scss">
-
+.sidebar {
+  .el-tabs__header {
+    margin-bottom: 0;
+  }
+  .el-tabs__item.is-top{
+    &:nth-child(2) {
+      padding-left: 20px;
+    }
+    &:last-child {
+      padding-right: 20px;
+    }
+  }
+}
 </style>
