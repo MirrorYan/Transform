@@ -1,41 +1,38 @@
 <template>
-  <el-drawer
-    title="实时执行记录"
+  <el-drawer class="result-drawer"
+    title="Request Detail"
     direction="rtl"
-    size="80%"
+    size="65%"
     :visible.sync="drawer"
+    :open="handleOpen()"
     :before-close="onBeforeClose">
     <div class="drawer-body">
-      <el-card shadow="hover" class="drawer-card">
-        <div slot="header">执行进度</div>
-        <el-progress :percentage="100" />
-        <div class="data-analys">
-          <p>已执行用例数：{{datas.details.length || 0}}</p>
-          <p>用例总数：{{datas.details.length || 0}}</p>
+      <el-card class="drawer-card">
+        <div slot="header">Results</div>
+        <div class="results-container">
+          <el-progress type="circle" :percentage="100" status="success" />
+          <div class="details">
+            <strong>请求平均耗时：<span class="green">{{datas.time.avg || 0}} ms</span></strong>
+            <strong>执行总耗时：<span class="green">{{datas.time.duration || 0}} s</span></strong>
+          </div>
+        </div>
+        <div class="results-container">
+          <el-progress type="circle"
+            :percentage="datas.stat.successes/datas.stat.testsRun"
+            :status="succStatus" />
+          <div class="details">
+            <span style="margin-right:20px">
+              <strong>总数：{{datas.stat.testsRun || 0}}</strong>
+              <span>成功：{{datas.stat.successes || 0}}</span>
+            </span>
+            <span>
+              <strong>失败：<span>{{datas.stat.failures || 0}}</span></strong>
+              <span>忽略数：{{datas.stat.failures || 0}}</span>
+            </span>
+          </div>
         </div>
       </el-card>
-      <el-card shadow="hover" class="drawer-card">
-        <div slot="header">成功率</div>
-        <el-progress :percentage="100" />
-        <div class="data-analys">
-          <span>成功数：{{datas.stat.successes || 0}}</span>
-          <span>失败数：{{datas.stat.failures || 0}}</span>
-          <span>忽略数：{{datas.stat.failures || 0}}</span>
-          <span>用例总数：{{datas.stat.testsRun || 0}}</span>
-        </div>
-      </el-card>
-      <el-card shadow="hover" class="drawer-card">
-        <div slot="header">前置脚本</div>
-        <el-table
-          data=""
-          class="table">
-          <el-table-column type="index" label="序号" width="50" />
-          <el-table-column prop="name" label="脚本名称" />
-          <el-table-column prop="status" label="状态" />
-          <el-table-column prop="operate" label="操作" />
-        </el-table>
-      </el-card>
-      <el-card shadow="hover" class="drawer-card">
+      <el-card class="drawer-card">
         <div slot="header">测试步骤</div>
         <el-table
           :data="datas.details[0].records"
@@ -72,8 +69,13 @@
 </template>
 
 <script>
+import Chart from './Chart';
+
 export default {
   name: 'SideDrawer',
+  components: {
+    Chart
+  },
   props: {  
     drawer: {
       type: Boolean,
@@ -83,7 +85,23 @@ export default {
       type: Object
     }
   },
+  computed: {
+    succStatus () {
+      let status = '';
+      const details = this.datas.stat;
+      const sum = details.successes / details.testsRun;
+      if (sum < 0.3) {
+        status = 'warning';
+      } else if (sum == 1) {
+        status = 'success';
+      }
+      return status;
+    }
+  },
   methods: {
+    handleOpen () {
+      console.log(this.datas)
+    },
     // Close => Tell the parent component will close.
     onBeforeClose () {
       this.$emit('close');
@@ -98,23 +116,85 @@ export default {
       if (status === 'failure') return 'warning';
       if (status === 'skipped') return 'info';
       if (status === 'error') return 'danger';
-    }
+    },
+    // 测试用例成功率饼图参数
+    // handleExeChart () {
+    //   let data = this.datas.stat;
+    //   console.log(this.datas)
+    //   return {
+    //     tooltip: {},
+    //     legend: {
+    //       orient: 'vertical',
+    //       left: 'left',
+    //       selectedMode: false,
+    //       selectorLabel: {
+    //         color: 'auto'
+    //       },
+    //       formatter: '{}',
+    //       data: ['成功', '跳过', '错误', '失败']
+    //     },
+    //     series: [{
+    //       type: 'pie',
+    //       radius: ['35%', '50%'],
+    //       hoverOffset: 5,
+    //       label: {
+    //         show: false,
+    //         position: 'center'
+    //       },
+    //       emphasis: {
+    //         label: {
+    //           show: true,
+    //           fontSize: '18',
+    //           fontWeight: 'bold'
+    //         }
+    //       },
+    //       data: [{
+    //         name: '成功',
+    //         value: data.successes,
+    //         itemStyle: {
+    //           color: '#a6db8c'
+    //         }
+    //       },{
+    //         name: '跳过',
+    //         value: data.skipped,
+    //         itemStyle: {
+    //           color: '#5ab1ef'
+    //         }
+    //       }, {
+    //         name: '错误',
+    //         value: data.errors,
+    //         itemStyle: {
+    //           color: '#fbb980'
+    //         }
+    //       }, {
+    //         name: '失败',
+    //         value: data.failures,
+    //         itemStyle: {
+    //           color: '#ff9898'
+    //         }
+    //       }]
+    //     }]
+    //   }
+    // },
   }
 }
 </script>
 
-<style lang="scss" scoped>
-.el-col {
-  margin-bottom: 20px;
-}
-.drawer-body {
-  display: flex;
-  flex-wrap: wrap;
+<style lang="scss">
+.result-drawer {
   .drawer-card {
-    width: 49%;
     margin-top: 30px;
-    &:nth-child(2n+1) {
-      margin-right: 2%;
+  }
+  .results-container {
+    display: inline-flex;
+    align-items: center;
+    width: 48%;
+    padding-left: 3%;
+    .details {
+      margin-left: 30px;
+    }
+    strong {
+      display: block;
     }
   }
 }

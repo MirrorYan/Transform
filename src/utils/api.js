@@ -30,5 +30,14 @@ export const JsYmConvert = ({type, data}) => Request({
   }
 });
 
+// Run testcase.
+export const runTstcs = (json) => Request({
+  url: domain + 'api/v1/runTestcase',
+  method: 'post',
+  data: {
+    json_data: json
+  }
+});
+
 // Upload .har file
 export const uploadHar = domain + 'api/v1/uploadHarFile';

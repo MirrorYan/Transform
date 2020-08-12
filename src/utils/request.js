@@ -1,6 +1,5 @@
 import axios from 'axios';
-import Vue from 'vue';
-import ElementUI from 'element-ui';
+import { Message } from 'element-ui';
 
 // 设置请求超时时间
 axios.defaults.timeout = 10000;
@@ -20,16 +19,15 @@ axios.interceptors.response.use(
     if (error.response.status) {
       // 404请求不存在
       if (error.response.status === 404) {
-        console.log('a');
-        ElementUI.$message({
+        Message({
           message: '网络请求不存在',
-          type: error,
+          type: 'error',
           duration: 1500
         });
       } else { // 其他错误，直接抛出错误提示
-        ElementUI.$message({
+        Message({
           message: error.response.data.message,
-          type: error,
+          type: 'error',
           duration: 1500
         });
       }

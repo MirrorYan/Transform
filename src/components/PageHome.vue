@@ -13,6 +13,7 @@
     <div class="button-group">
       <el-button type="primary">Save</el-button>
       <el-button type="success"
+        :disabled="jsonValue === ''"
         @click="onRunClk"
       >Run</el-button>
       <el-upload class="upload-har"
@@ -25,8 +26,7 @@
         plain
         @click="onTransClk(1, jsonValue)"
       ><em class="el-icon-right"></em>json2yaml</el-button>
-      <el-button
-        type="danger"
+      <el-button type="danger"
         plain
         @click="onTransClk(2, yamlValue)">
         <em class="el-icon-back"></em>yaml2json
@@ -117,7 +117,7 @@
 <script>
 import Sidebar from './parts/Sidebar';
 import SideDrawer from './parts/SideDrawer';
-import { uploadHar, JsYmConvert } from '../utils/api';
+import { uploadHar, JsYmConvert, runTstcs } from '../utils/api';
 import 'codemirror/addon/lint/lint.css';
 require('script-loader!jsonlint');
 import 'codemirror/addon/lint/lint';
@@ -179,25 +179,18 @@ export default {
         json = JSON.parse(this.jsonValue);
       } catch (err) {
         this.$message({
-          type: "warning",
-          message: 'JSON内容不符合规则，不能执行哦',
+          type: 'error',
+          message: 'JSON内容不符合规则，不能执行!',
           duration: 2000
         });
         return;
       }
       this.loading = true;
-      axios({
-        url: URL.runYaml,
-        method: 'post',
-        data: {
-          json_data: json
-        }
-      }).then((res) => {
-        if (res.data.code != 10000) return;
+      runTstcs(json).then(res => {
         this.runData = res.data;
         this.drawer = true;
         this.loading = false;
-      });
+      })
     },
     onRequstDtl (requestDtl) {
       console.log(1);
@@ -215,16 +208,16 @@ export default {
     // Click(YAML <=> JSON) => Transform the code type.
     onTransClk (type, text) {
       const that = this;
-      let valueName = 'jsonValue';
-      if (type === 1) {
-        text = JSON.parse(text);
-        valueName = 'yamlValue';
-      }
+      type === 1 && (text = JSON.parse(text));
       JsYmConvert({
         type,
         data: text
       }).then(res => {
-        that[valueName] = res.detail;
+        if (type === 1) {
+          that.yamlValue = res.detail;
+        } else {
+          that.jsonValue = JSON.stringify(res.detail, null, 2);
+        }
       });
     }
   }
