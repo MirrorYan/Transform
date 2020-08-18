@@ -6,65 +6,68 @@
     :visible.sync="drawer"
     :open="handleOpen()"
     :before-close="onBeforeClose">
-    <div class="drawer-body">
-      <el-card class="drawer-card">
-        <div slot="header">Results</div>
-        <div class="results-container">
-          <el-progress type="circle" :percentage="100" status="success" />
-          <div class="details">
-            <strong>请求平均耗时：<span class="green">{{datas.time.avg || 0}} ms</span></strong>
-            <strong>执行总耗时：<span class="green">{{datas.time.duration || 0}} s</span></strong>
+    <el-scrollbar style="height: 100%">
+      <div class="drawer-body">
+        <el-card class="drawer-card chart-card">
+          <div slot="header">Results</div>
+          <div class="results-container">
+            <el-progress type="circle" :percentage="100" status="success" />
+            <div class="details">
+              <p><strong>请求平均耗时：<span class="green">{{datas.time.avg || 0}} ms</span></strong></p>
+              <p><strong>执行总耗时：<span class="green">{{datas.time.duration || 0}} s</span></strong></p>
+            </div>
           </div>
-        </div>
-        <div class="results-container">
-          <el-progress type="circle"
-            :percentage="datas.stat.successes/datas.stat.testsRun"
-            :status="succStatus" />
-          <div class="details">
-            <span style="margin-right:20px">
-              <strong>总数：{{datas.stat.testsRun || 0}}</strong>
-              <span>成功：{{datas.stat.successes || 0}}</span>
-            </span>
-            <span>
-              <strong>失败：<span>{{datas.stat.failures || 0}}</span></strong>
-              <span>忽略数：{{datas.stat.failures || 0}}</span>
-            </span>
+          <div class="results-container">
+            <el-progress type="circle"
+              :percentage="datas.stat.successes/datas.stat.testsRun"
+              :status="succStatus" />
+            <div class="details succRateDtl">
+              <span style="margin-right:20px;">
+                <p><strong>总数：{{datas.stat.testsRun || 0}}</strong></p>
+                <p>成功：{{datas.stat.successes || 0}}</p>
+                <p>失败：{{datas.stat.failures || 0}}</p>
+              </span>
+              <span>
+                <p><strong>通过率：<span class="green">{{passRate}}</span></strong></p>
+                <p>忽略数：{{datas.stat.failures || 0}}</p>
+              </span>
+            </div>
           </div>
-        </div>
-      </el-card>
-      <el-card class="drawer-card">
-        <div slot="header">测试步骤</div>
-        <el-table
-          :data="datas.details[0].records"
-          max-height="500"
-          fit
-          stripe>
-          <el-table-column type="index" label="序号" width="50" align="center" />
-          <el-table-column prop="name" label="用例名称" />
-          <el-table-column
-            prop="meta_data.response.response_time_ms"
-            width="110"
-            label="执行时间(ms)"
-            align="center"
-          />
-          <el-table-column label="执行状态">
-            <el-tag
-              slot-scope="scope"
-              :type="handleStatus(scope.row.status)"
-            >{{scope.row.status}}</el-tag>
-          </el-table-column>
-          <el-table-column prop="attachment" label="日志" />
-          <el-table-column label="操作" width="50">
-            <template slot-scope="scope">
-              <el-link
-                type="primary"
-                @click="onWatchClk(scope.row)"
-              >查看</el-link>
-            </template>
-          </el-table-column>
-        </el-table>
-      </el-card>
-    </div>
+        </el-card>
+        <el-card class="drawer-card">
+          <div slot="header">测试步骤</div>
+          <el-table
+            :data="datas.details[0].records"
+            max-height="500"
+            fit
+            stripe>
+            <el-table-column type="index" label="序号" width="50" align="center" />
+            <el-table-column prop="name" label="用例名称" />
+            <el-table-column
+              prop="meta_data.response.response_time_ms"
+              width="110"
+              label="执行时间(ms)"
+              align="center"
+            />
+            <el-table-column label="执行状态">
+              <el-tag
+                slot-scope="scope"
+                :type="handleStatus(scope.row.status)"
+              >{{scope.row.status}}</el-tag>
+            </el-table-column>
+            <el-table-column prop="attachment" label="日志" />
+            <el-table-column label="操作" width="50">
+              <template slot-scope="scope">
+                <el-link
+                  type="primary"
+                  @click="onWatchClk(scope.row)"
+                >查看</el-link>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-card>
+      </div>
+    </el-scrollbar>
   </el-drawer>
 </template>
 
@@ -96,6 +99,12 @@ export default {
         status = 'success';
       }
       return status;
+    },
+    passRate () {
+      let sum = 0;
+      const details = this.datas.stat;
+      sum = (details.successes/details.testsRun).toFixed(1);
+      return sum + '%';
     }
   },
   methods: {
@@ -182,20 +191,43 @@ export default {
 
 <style lang="scss">
 .result-drawer {
-  .drawer-card {
+  .drawer-card + .drawer-card {
     margin-top: 30px;
   }
   .results-container {
     display: inline-flex;
     align-items: center;
     width: 48%;
+    min-width: 400px;
     padding-left: 3%;
+    margin: 10px 0;
     .details {
       margin-left: 30px;
+      line-height: 1.6;
+    }
+    .succRateDtl {
+      > span {
+        display:inline-block;
+        vertical-align:top;
+        > span {
+          display: block;
+        }
+      }
     }
     strong {
       display: block;
     }
+  }
+  .el-scrollbar__wrap {
+    overflow-x: hidden;
+  }
+}
+.chart-card {
+  .el-card__body {
+    text-align: center;
+  }
+  .results-container {
+    text-align: left;
   }
 }
 .table {

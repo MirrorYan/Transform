@@ -9,3 +9,24 @@
   height: 40px;
   line-height: 40px;
 }
+
+// Drawer
+.el-drawer {
+  .el-scrollbar__wrap {
+    padding: 0 25px 25px;
+  }
+}
+.el-drawer__header {
+  margin-bottom: 30px;
+  [role=heading] {
+    outline: 0;
+  }
+}
+.el-drawer__body {
+  overflow: hidden;
+}
+
+// Dialog
+.el-dialog__body {
+  font-size: 16px;
+}
