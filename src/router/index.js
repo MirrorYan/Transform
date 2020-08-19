@@ -10,6 +10,10 @@ export default new Router({
       name: 'Home',
       component: () => import ('@/components/PageHome')
     }, {
+      path: '/login',
+      name: 'Login',
+      component: () => import ('@/components/PageLogin')
+    }, {
       path: '/report',
       name: 'Report',
       component: () => import ('@/components/PageReport')

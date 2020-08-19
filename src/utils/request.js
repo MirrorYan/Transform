@@ -1,13 +1,29 @@
 import axios from 'axios';
+import router from '../router';
 import { Message } from 'element-ui';
 
 // 设置请求超时时间
 axios.defaults.timeout = 10000;
 // 设置POST请求头
-axios.defaults.headers.token = '92957a6b2e16a84cd5293001d07ae04f2c490d55';
+axios.defaults.headers.Token = '92957a6b2e16a84cd5293001d07ae04f2c490d55';
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8;multipart/form-data'
 
-// 响应拦截器
+// Request Interceptor
+axios.interceptors.request.use(
+  config => {
+    const token = window.localStorage.getItem('token');
+    if (token) {
+      config.headers.Token = token;
+    } else {
+      router.push({path: '/login'});
+    }
+    return config;
+  },
+  err => {
+    return Promise.reject(err);
+  }
+);
+// Response Interceptor
 axios.interceptors.response.use(
   response => {
     if (response.data.code === 10000) {
