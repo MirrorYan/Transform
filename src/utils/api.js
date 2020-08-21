@@ -1,28 +1,32 @@
-import { Request } from './request';
-
-const domain = 'http://192.168.7.71:8000/';
+import { domain, Request } from './request';
 
 export const URL = {
-  getDetail: domain + 'getYamlDetail', // 获取文件详情
-  convert: domain + 'convert', // JSON & YAML 转换
-  runYaml: domain + 'Api/runYaml', // 执行
+  getDetail: 'getYamlDetail', // 获取文件详情
+  convert: 'convert', // JSON & YAML 转换
+  runYaml: 'Api/runYaml', // 执行
 };
+
+export const userLogin = (data) => Request({
+  url: 'api/v1/login',
+  method: 'post',
+  data
+});
 
 // Get testcase list
 export const getTstcsLst = () => Request({
-  url: domain + 'api/v1/testcases/',
+  url: 'api/v1/testcases/',
   method: 'get'
 });
 
 // Get testcase detail
 export const getTstcsDtl = (id) => Request({
-  url: domain + 'api/v1/testcase/' + id,
+  url: 'api/v1/testcase/' + id,
   method: 'get'
 });
 
 // JSON & YAML conversion
 export const JsYmConvert = ({type, data}) => Request({
-  url: domain + 'api/v1/convert',
+  url: 'api/v1/convert',
   method: 'post',
   data: {
     type,
@@ -32,7 +36,7 @@ export const JsYmConvert = ({type, data}) => Request({
 
 // Run testcase.
 export const runTstcs = (json) => Request({
-  url: domain + 'api/v1/runTestcase',
+  url: 'api/v1/runTestcase',
   method: 'post',
   data: {
     json_data: json

@@ -1,11 +1,10 @@
 <template>
   <header>
-    <h2>JSON和YML在线转换</h2>
+    <img src="../../assets/logo.png" alt="Logo">
     <el-menu
       :default-active="$route.path"
       mode="horizontal"
-      router
-    >
+      router>
       <el-menu-item
         v-for="(item, index) in $router.options.routes"
         :index="item.path"
@@ -21,11 +20,9 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 header {
-  @include flex;
   padding: 0 10px;
-  background: $blue;
 }
 h2 {
   color: #fff;

@@ -2,6 +2,8 @@ import axios from 'axios';
 import router from '../router';
 import { Message } from 'element-ui';
 
+const domain = 'http://192.168.7.71:8000/';
+
 // 设置请求超时时间
 axios.defaults.timeout = 10000;
 // 设置POST请求头
@@ -14,8 +16,12 @@ axios.interceptors.request.use(
     const token = window.localStorage.getItem('token');
     if (token) {
       config.headers.Token = token;
-    } else {
+      console.log(1);
+    } else if (config.url.indexOf('/login') == -1) {
       router.push({path: '/login'});
+    }
+    if (config.url.indexOf(domain) === -1) {
+      config.url = domain + config.url; // 拼接url
     }
     return config;
   },
@@ -33,17 +39,22 @@ axios.interceptors.response.use(
     }
   },
   error => {
-    if (error.response.status) {
+    const res = error.response;
+    if (res.status) {
       // 404请求不存在
-      if (error.response.status === 404) {
+      if (res.status === 404) {
         Message({
           message: '网络请求不存在',
           type: 'error',
           duration: 1500
         });
       } else { // 其他错误，直接抛出错误提示
+        let errMsg = res.data.detail;
+        if (typeof errMsg === 'object') {
+          errMsg = JSON.stringify(res.data.detail)
+        }
         Message({
-          message: error.response.data.message,
+          message: `HTTPCode:${res.status}, ${errMsg}`,
           type: 'error',
           duration: 1500
         });
@@ -60,7 +71,7 @@ axios.interceptors.response.use(
  * @param {String} url [request address]
  * @param {Object} params [request parameters]
  */
-export function Request ({url, method, ...params}) {
+function Request ({url, method, ...params}) {
   return new Promise((resolve, reject) => {
     axios({
       url,
@@ -72,4 +83,9 @@ export function Request ({url, method, ...params}) {
       reject(err.data);
     });
   });
+}
+
+export {
+  domain,
+  Request
 }
