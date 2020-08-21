@@ -13,6 +13,7 @@
           <el-form-item label="密码" prop="password">
             <el-input type="password" v-model="form.password" />
           </el-form-item>
+          
           <el-form-item label-width="10px">
             <el-checkbox label="记住密码" name="remember" />
             <el-link href="/forget" type="primary" class="forget">忘记密码?</el-link>
