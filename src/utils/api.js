@@ -12,9 +12,20 @@ export const userLogin = (data) => Request({
   data
 });
 
+export const getVerifyCode = () => Request({
+  url: 'api/v1/verify',
+  method: 'get'
+});
+
 // Get testcase list
 export const getTstcsLst = () => Request({
   url: 'api/v1/testcases/',
+  method: 'get'
+});
+
+// Get History list
+export const getHistoryLst = () => Request({
+  url: 'api/v1/history',
   method: 'get'
 });
 

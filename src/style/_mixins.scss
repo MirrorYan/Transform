@@ -26,3 +26,10 @@
   -ms-flex-direction: $value;
   flex-direction: $value;
 }
+
+// After clear
+@mixin clear {
+  content: '';
+  display: block;
+  clear: both;
+}

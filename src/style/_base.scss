@@ -15,6 +15,11 @@ h2 {
   font-weight: 500;
 }
 
+button {
+  cursor: pointer;
+  outline: none;
+}
+
 .blue {
   color: $blue;
 }
@@ -28,11 +33,7 @@ h2 {
 }
 
 .container {
-  height: calc(100vh - 60px);
-}
-
-.left-aside-menu {
-  overflow: auto;
+  height: calc(100vh - 90px);
 }
 
 

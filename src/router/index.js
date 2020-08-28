@@ -9,14 +9,17 @@ const router = new Router({
     {
       path: '/',
       name: 'Home',
+      icon: 'el-icon-s-home',
       component: () => import ('@/components/PageHome')
     }, {
       path: '/login',
       name: 'Login',
+      icon: '',
       component: () => import ('@/components/PageLogin')
     }, {
       path: '/report',
       name: 'Report',
+      icon: '',
       component: () => import ('@/components/PageReport')
     }
   ]

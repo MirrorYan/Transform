@@ -2,7 +2,7 @@ import axios from 'axios';
 import router from '../router';
 import { Message } from 'element-ui';
 
-const domain = 'http://192.168.7.71:8000/';
+const domain = 'http://192.168.12.190:8000/';
 
 // 设置请求超时时间
 axios.defaults.timeout = 10000;
@@ -16,7 +16,6 @@ axios.interceptors.request.use(
     const token = window.localStorage.getItem('token');
     if (token) {
       config.headers.Token = token;
-      console.log(1);
     } else if (config.url.indexOf('/login') == -1) {
       router.push({path: '/login'});
     }
@@ -41,6 +40,15 @@ axios.interceptors.response.use(
   error => {
     const res = error.response;
     if (res.status) {
+      // 400 Token问题
+      if (res.status === 400) {
+        router.push({path: '/login'});
+        Message({
+          message: '登录失效，请重新登录',
+          type: 'error',
+          duration: 1500
+        });
+      }
       // 404请求不存在
       if (res.status === 404) {
         Message({
