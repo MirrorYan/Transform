@@ -17,10 +17,10 @@ const router = new Router({
       icon: '',
       component: () => import ('@/components/PageLogin')
     }, {
-      path: '/report',
-      name: 'Report',
-      icon: '',
-      component: () => import ('@/components/PageReport')
+      path: '/mock',
+      name: 'Mock',
+      icon: 'el-icon-magic-stick',
+      component: () => import ('@/components/PageMock')
     }
   ]
 });

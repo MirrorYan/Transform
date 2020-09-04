@@ -1,45 +1,55 @@
 <template>
-  <div class="container" v-loading="loading">
+  <div class="container home-page" v-loading="loading">
     <Sidebar @detail="handleGetDetail" />
-    <div class="code-container json-code">
-      <div class="title">JSON</div>
-      <codemirror
-        ref="jsonEditor"
-        :options="jsonOpt"
-        :value="jsonValue"
-        @changes="onJsonChg"
-      />
-    </div>
-    <div class="button-group">
-      <el-button type="primary">Save</el-button>
-      <el-button type="success"
-        :disabled="jsonValue === ''"
-        @click="onRunClk"
-      >Run</el-button>
-      <el-upload class="upload-har"
-        :action="uploadHar"
-        :on-success="handleHarSucc"
-        accept=".har">
-        <el-button type="info" plain>har2yaml</el-button>
-      </el-upload>
-      <el-button type="warning"
-        plain
-        @click="onTransClk(1, jsonValue)"
-      ><em class="el-icon-right"></em>json2yaml</el-button>
-      <el-button type="danger"
-        plain
-        @click="onTransClk(2, yamlValue)">
-        <em class="el-icon-back"></em>yaml2json
-      </el-button>
-    </div>
-    <div class="code-container yml-code">
-      <div class="title">YAML</div>
-      <codemirror
-        ref="ymlEditor"
-        :options="yamlOpt"
-        :value="yamlValue"
-        @changes="onYamlChg"
-      />
+    <div class="right-container">
+      <div class="button-group">
+        <el-button type="primary"
+          icon="el-icon-download"
+        >Save</el-button>
+        <el-button type="success"
+          icon="el-icon-video-play"
+          :disabled="jsonValue === ''"
+          @click="onRunClk"
+        >Run</el-button>
+        <el-upload class="upload-har"
+          action="actionString"
+          accept=".har"
+          :show-file-list="false"
+          :before-upload="handleBeforeUpload"
+          :http-request="handleUpload">
+          <el-button type="info"
+            icon="el-icon-upload2"
+          >Upload .har file</el-button>
+        </el-upload>
+        <el-button type="warning"
+          icon="el-icon-refresh"
+          @click="onTransClk(1, jsonValue)"
+        >json2yaml</el-button>
+        <el-button type="danger"
+          icon="el-icon-refresh"
+          @click="onTransClk(2, yamlValue)"
+        >yaml2json</el-button>
+      </div>
+      <div class="code-container">
+        <div class="code-content json-code">
+          <div class="title">JSON</div>
+          <codemirror
+            ref="jsonEditor"
+            :options="jsonOpt"
+            :value="jsonValue"
+            @changes="onJsonChg"
+          />
+        </div>
+        <div class="code-content yml-code">
+          <div class="title">YAML</div>
+          <codemirror
+            ref="ymlEditor"
+            :options="yamlOpt"
+            :value="yamlValue"
+            @changes="onYamlChg"
+          />
+        </div>
+      </div>
     </div>
     <SideDrawer
       v-if="runData"
@@ -200,10 +210,31 @@ export default {
     DrawerClose () {
       this.drawer = false;
     },
-    // For .har file upload success.
-    handleHarSucc (res, file, fileList) {
-      this.jsonValue = JSON.stringify(res, null, 2);
-      this.yamlValue = '';
+    // Series functions for uploading .har files.
+    handleBeforeUpload (file) {
+      const isLt10M = file.size / 1024 / 1024 < 10;
+      if (!isLt10M) { 
+        this.$message.error('上传文件大小不能超过 10MB ！');
+      }
+      return isLt10M;
+    },
+    handleUpload (param) {
+      let formData = new FormData();
+      formData.append('file', param.file);
+      uploadHar(formData).then(res => {
+        this.$message({
+          type: 'success',
+          message: '文件上传成功！',
+          duration: 1500
+        });
+        this.jsonValue = JSON.stringify(res.json_data, null, 2);
+        this.yamlValue = res.yaml_data;
+      }).catch(res => {
+        this.$message.error({
+          message: '文件上传失败！',
+          duration: 1500
+        });
+      });
     },
     // Click(YAML <=> JSON) => Transform the code type.
     onTransClk (type, text) {
@@ -224,46 +255,51 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-.container {
+<style lang="scss">
+.home-page {
   display: flex;
-}
-.el-menu {
-  flex: 1;
-}
-.button-group {
-  padding: 50px 10px 10px;
-}
-.el-button {
-  display: block;
-  width: 100%;
-  margin: 20px auto 0;
-  padding: 10px 15px;
-  font-size: 16px;
-  em {
-    font-size: 20px;
-    font-weight: bold;
+  .el-menu {
+    flex: 1;
+  }
+  .button-group {
+    padding: 10px 20px;
+  }
+  .el-button {
+    margin: 5px;
+    padding: 10px 15px;
+    font-size: 16px;
+    em {
+      font-size: 20px;
+      font-weight: bold;
+    }
+  }
+  .upload-har {
+    display: inline-block;
+  }
+  .right-container,
+  .code-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .code-container {
+    flex: 1;
+    display: flex;
+  }
+  .code-content {
+    width: 0;
+    height: 100%;
+    border-right: 1px solid #eee;
+    .title {
+      padding: 10px;
+      background-color: #efefef;
+    }
+  }
+  .vue-codemirror {
+    flex: 1;
+    height: 0;
   }
 }
-.code-container {
-  flex: 3;
-}
-.code-container {
-  height: 100%;
-  display: flex;
-  width: 0;
-  flex-direction: column;
-  border: 1px solid #efefef;
-  .title {
-    padding: 10px;
-    background-color: #efefef;
-  }
-}
-.vue-codemirror {
-  flex: 1;
-  height: 0;
-}
-
 .dialog-block {
   & + .dialog-block {
     margin-top: 40px;

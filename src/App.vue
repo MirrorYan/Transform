@@ -7,11 +7,15 @@
 
 <script>
 import Header from './components/parts/Header';
+import { WebSocketTst } from './utils/websocket';
 
 export default {
   name: 'App',
   components: {
     Header
+  },
+  mounted () {
+    WebSocketTst();
   }
 };
 </script>

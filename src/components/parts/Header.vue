@@ -39,6 +39,7 @@ header {
   display: flex;
   height: 90px;
   border-bottom: 1px solid #eee;
+  box-shadow: 0 1px 10px #eee;
   .logo {
     width: 160px;
     margin: 5px 0 4px 30px;

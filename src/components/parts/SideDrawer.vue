@@ -46,8 +46,8 @@
             max-height="500"
             fit
             stripe>
-            <el-table-column type="index" label="No." width="50" align="center" />
-            <el-table-column label="Method" width="80" align="center">
+            <el-table-column type="index" label="No." width="50" fixed align="center" />
+            <el-table-column label="Method" width="80" fixed align="center">
               <el-tag slot-scope="scope"
                 :type="handleMethod(scope.row.meta_data.request.method)"
               >{{scope.row.meta_data.request.method.toUpperCase()}}</el-tag>

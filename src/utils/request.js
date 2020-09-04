@@ -2,7 +2,7 @@ import axios from 'axios';
 import router from '../router';
 import { Message } from 'element-ui';
 
-const domain = 'http://192.168.12.190:8000/';
+const domain = 'http://192.168.7.71:8000/';
 
 // 设置请求超时时间
 axios.defaults.timeout = 10000;
@@ -32,9 +32,9 @@ axios.interceptors.request.use(
 axios.interceptors.response.use(
   response => {
     if (response.data.code === 10000) {
-      return Promise.resolve(response)
+      return Promise.resolve(response);
     } else {
-      return Promise.reject(response)
+      return Promise.reject(response);
     }
   },
   error => {
@@ -56,7 +56,7 @@ axios.interceptors.response.use(
           type: 'error',
           duration: 1500
         });
-      } else { // 其他错误，直接抛出错误提示
+      } else { // 其他错误，直接弹出错误提示
         let errMsg = res.data.detail;
         if (typeof errMsg === 'object') {
           errMsg = JSON.stringify(res.data.detail)

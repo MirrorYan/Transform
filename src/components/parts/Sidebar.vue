@@ -15,7 +15,7 @@
     </el-tab-pane>
     <el-tab-pane label="Testcases" name="collection">
       <el-scrollbar>
-        <el-button type="primary"><em class="el-icon-plus"></em> Add Testcase</el-button>
+        <el-button type="primary" icon="el-icon-plus">Add Testcase</el-button>
         <el-menu class="left-aside-menu">
           <el-menu-item
             v-for="(item, index) in testcaseLst"
@@ -28,36 +28,53 @@
         </el-menu>
       </el-scrollbar>
     </el-tab-pane>
-    <el-tab-pane label="APIs" name="api"></el-tab-pane>
+    <el-tab-pane label="APIs" name="api">
+      <el-scrollbar>
+        <el-button type="primary" icon="el-icon-plus">Add Testcase</el-button>
+        <el-menu class="left-aside-menu">
+          <el-menu-item
+            v-for="(item, index) in teststepLst"
+            :index="'step-'+index"
+            :key="index"
+            @click="onTestcaseClk(item.id)">
+            <el-tag :type="handleColor(item.data.method)">{{item.data.method}}</el-tag>
+            <span slot="title">{{item.name}}</span>
+          </el-menu-item>
+        </el-menu>
+      </el-scrollbar>
+    </el-tab-pane>
   </el-tabs>
 </template>
 
 <script>
-import { getTstcsLst, getTstcsDtl, getHistoryLst } from '../../utils/api';
+import { getTstcsLst, getTstcsDtl, getHistoryLst, getTstStepLst } from '../../utils/api';
 export default {
   name: 'Sidebar',
   components: {
   },
   beforeCreate () {
-    let that = this;
     // Load history list.
-    getHistoryLst().then(res => { console.log(res.data);this.historyLst = res.data; });
+    getHistoryLst().then(res => { this.historyLst = res.data; });
     // Load testcase list.
-    getTstcsLst().then(res => { that.testcaseLst = res.data; });
+    getTstcsLst().then(res => { this.testcaseLst = res.data; });
+    // Load api list.
+    getTstStepLst().then(res => { this.teststepLst = res.data; });
   },
   data () {
     return {
       activeTab: 'history',
       historyLst: [],
-      testcaseLst: []
+      testcaseLst: [],
+      teststepLst: []
     }
   },
   methods: {
     handleColor (method) {
       if (method === 'GET') return 'success';
       if (method === 'POST') return '';
-      if (method === 'PUT') return 'blue';
-      return 'info ';
+      if (method === 'PUT') return 'warning';
+      if (method === 'DELETE') return 'danger';
+      return 'info';
     },
     // Click(history) => Load json
     onHistoryClk (id) {
@@ -75,6 +92,7 @@ export default {
 <style lang="scss">
 .sidebar {
   width: 300px;
+  border-right: 1px solid #eee;
   &.el-tabs {
     display: flex;
     flex-direction: column;

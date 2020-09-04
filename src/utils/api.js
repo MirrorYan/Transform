@@ -1,4 +1,4 @@
-import { domain, Request } from './request';
+import { Request } from './request';
 
 export const URL = {
   getDetail: 'getYamlDetail', // 获取文件详情
@@ -23,16 +23,26 @@ export const getTstcsLst = () => Request({
   method: 'get'
 });
 
+// Get testcase detail
+export const getTstcsDtl = (id) => Request({
+  url: 'api/v1/testcase/' + id,
+  method: 'get'
+});
+
 // Get History list
 export const getHistoryLst = () => Request({
   url: 'api/v1/history',
   method: 'get'
 });
 
-// Get testcase detail
-export const getTstcsDtl = (id) => Request({
-  url: 'api/v1/testcase/' + id,
-  method: 'get'
+// Get Test step list.
+export const getTstStepLst = ({skip=0, limit=100 }={}) => Request({
+  url: 'api/v1/teststeps',
+  method: 'get',
+  data: {
+    skip,
+    limit
+  }
 });
 
 // JSON & YAML conversion
@@ -47,7 +57,7 @@ export const JsYmConvert = ({type, data}) => Request({
 
 // Run testcase.
 export const runTstcs = (json) => Request({
-  url: 'api/v1/runTestcase',
+  url: 'api/v1/runTestCase',
   method: 'post',
   data: {
     json_data: json
@@ -55,4 +65,8 @@ export const runTstcs = (json) => Request({
 });
 
 // Upload .har file
-export const uploadHar = domain + 'api/v1/uploadHarFile';
+export const uploadHar = (file) => Request({
+  url: 'api/v1/uploadHarFile',
+  method: 'post',
+  data: file
+});
